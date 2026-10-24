@@ -1,184 +1,186 @@
 # Cloud & DevOps Learning Hub
 
-A beginner-friendly Cloud/DevOps project built by two friends to learn Git, GitHub, Docker, Nginx, and AWS EC2 through a real-world website deployment.
+A hands-on Cloud and DevOps project demonstrating Git, GitHub, Docker, Nginx, and deployment of a containerized website on an AWS EC2 instance.
 
 ## Project Overview
 
-We created a custom HTML website, packaged it into a Docker image using Nginx, and ran it locally in a Docker container. Our next goal is to deploy the same website on an AWS EC2 Linux instance.
+The goal of this project is to build a simple website, package it into a Docker image, and deploy it on an AWS EC2 virtual server so that it can be accessed through a web browser.
 
-## Technology Stack
+## Technologies Used
 
-- **HTML** — Website content
-- **Git** — Version control
-- **GitHub** — Source code hosting and collaboration
-- **Docker** — Application containerization
-- **Nginx** — Web server
-- **AWS EC2** — Planned cloud deployment
-- **Ubuntu on WSL2** — Local development environment
+- **Git** – Version control
+- **GitHub** – Source code hosting
+- **Docker** – Containerization
+- **Dockerfile** – Instructions to build the Docker image
+- **Nginx** – Web server
+- **AWS EC2** – Cloud virtual machine
+- **Ubuntu Linux** – Operating system
+- **Security Groups** – Network access control
 
-## Architecture
+## Project Architecture
 
-```text
-Developer
-   |
-   v
-HTML Website (index.html)
-   |
-   v
-Git Repository
-   |
-   v
-GitHub Repository
-   |
-   v
-Docker Image (cloud-pra:v1)
-   |
-   v
-Docker Container (cloud-pra-web)
-   |
-   v
-Nginx Web Server
-   |
-   v
-Browser: http://localhost:8080
+Developer → Git → GitHub → AWS EC2 (Ubuntu) → Docker Container → Nginx Web Server → Website
 
-Planned next step:
-Docker Container on AWS EC2
-   |
-   v
-Public Browser Access over HTTP
+## Project 1: Build a Website Using Docker
+
+### 1. Create the Website
+
+Created an `index.html` file displaying the Cloud & DevOps Learning Hub webpage.
+
+### 2. Create the Dockerfile
+
+```dockerfile
+FROM nginx:alpine
+COPY index.html /usr/share/nginx/html/index.html
+EXPOSE 80
 ```
 
-## Project Files
+**Explanation:**
+- `FROM nginx:alpine` – Uses the lightweight Nginx image.
+- `COPY` – Copies the website into Nginx's web directory.
+- `EXPOSE 80` – Documents the port used by the web server.
 
-```text
-cloud-pra/
-├── index.html
-├── Dockerfile
-└── README.md
+### 3. Build the Docker Image
+
+```bash
+docker build -t cloud-pra:v1 .
 ```
 
-## Run the Website Locally
+### 4. Run the Container Locally
 
-### Prerequisites
+```bash
+docker run -d --name cloud-pra-web -p 8080:80 cloud-pra:v1
+```
 
-- Git
-- Docker Desktop with WSL2 integration enabled
-- Ubuntu on WSL2
+Open `http://localhost:8080` to verify the website.
 
-### 1. Clone the Repository
+## Project 2: Install Docker on AWS EC2
+
+### 1. Launch an EC2 Instance
+
+- Launched an Ubuntu EC2 instance on AWS.
+- Configured a security group to allow SSH access from my IP address.
+- Allowed inbound HTTP traffic on port 80 to access the website.
+
+### 2. Connect to EC2 Using SSH
+
+```bash
+chmod 400 cloud-pra-key.pem
+ssh -i cloud-pra-key.pem ubuntu@<EC2-PUBLIC-IP>
+```
+
+Replace `<EC2-PUBLIC-IP>` with your instance's public IP address.
+
+### 3. Update Ubuntu Packages
+
+```bash
+sudo apt update
+```
+
+### 4. Install Docker
+
+```bash
+sudo apt install -y docker.io
+```
+
+### 5. Start Docker
+
+```bash
+sudo systemctl enable --now docker
+```
+
+### 6. Verify Docker Installation
+
+```bash
+sudo docker --version
+sudo docker ps
+```
+
+### 7. Clone the GitHub Repository on EC2
 
 ```bash
 git clone https://github.com/MansiPandey-git/cloud-pra.git
 cd cloud-pra
 ```
 
-### 2. Build the Docker Image
+### 8. Build the Docker Image on EC2
 
 ```bash
-docker build -t cloud-pra:v1 .
+sudo docker build -t cloud-pra:v1 .
 ```
 
-### 3. Run the Container
+### 9. Deploy the Website Container
 
 ```bash
-docker run -d --name cloud-pra-web -p 8080:80 cloud-pra:v1
+sudo docker run -d --name cloud-pra-web -p 80:80 cloud-pra:v1
 ```
 
-### 4. Open the Website
+### 10. Verify the Deployment
 
-Visit the following address in your browser:
+Open the following URL in your browser:
 
-http://localhost:8080
+`http://<EC2-PUBLIC-IP>`
 
-### 5. Stop the Container
+The Cloud & DevOps Learning Hub website should appear.
+
+### 11. Useful Docker Commands
+
+Check running containers:
 
 ```bash
-docker stop cloud-pra-web
+sudo docker ps
 ```
 
-To start it again:
+List Docker images:
 
 ```bash
-docker start cloud-pra-web
+sudo docker images
 ```
 
-## Dockerfile
-
-```dockerfile
-FROM nginx:alpine
-
-COPY index.html /usr/share/nginx/html/index.html
-
-EXPOSE 80
-```
-
-The Dockerfile uses the lightweight Nginx Alpine image, copies our HTML page into Nginx's default website directory, and documents port 80 as the container's web port.
-
-## Git Workflow
-
-Initialize the repository:
+View container logs:
 
 ```bash
-git init
-git branch -m main
+sudo docker logs cloud-pra-web
 ```
 
-Stage and commit changes:
+Stop the container:
 
 ```bash
-git add index.html Dockerfile README.md
-git commit -m "Add project documentation"
+sudo docker stop cloud-pra-web
 ```
 
-Push changes to GitHub:
+Start the container again:
 
 ```bash
-git push origin main
+sudo docker start cloud-pra-web
 ```
 
-## Team Collaboration
+## Key Learnings
 
-We are working as a team of two.
+- Created and managed a Git repository using Git and GitHub.
+- Built a Docker image using a Dockerfile.
+- Ran a containerized Nginx website locally.
+- Installed and verified Docker on an AWS EC2 Ubuntu instance.
+- Pulled project source code from GitHub onto EC2.
+- Deployed a Docker container and made the website publicly accessible over HTTP.
+- Learned basic Docker commands and AWS security group configuration.
 
-- **Developer 1:** Website development and README documentation.
-- **Developer 2:** Docker verification and deployment testing.
+## Security Notes
 
-Both team members will practise Git and Docker commands. We will use branches and pull requests when collaborating on changes to avoid overwriting each other's work.
+- Never commit private SSH keys, passwords, access tokens, or other credentials to GitHub.
+- Restrict SSH access to your own IP address.
+- Allow only the network ports required for the project.
+- HTTP traffic is unencrypted; HTTPS would be a future improvement.
 
-## Planned AWS Deployment
+## Future Improvements
 
-Our next phase is to deploy the Dockerized website on an AWS EC2 Linux instance.
+- Integrate Jenkins for CI/CD automation.
+- Create a Jenkins Pipeline using a `Jenkinsfile`.
+- Automate Docker image builds after GitHub code changes.
+- Explore Kubernetes for container orchestration.
 
-Planned steps:
+## Author
 
-1. Review AWS billing, available credits, and possible charges.
-2. Select a suitable small EC2 instance after checking current pricing.
-3. Configure SSH access restricted to our own IP address where possible.
-4. Allow inbound HTTP traffic on port 80 for website access.
-5. Install Docker on the EC2 instance.
-6. Clone the GitHub repository and build the Docker image.
-7. Run the container with the appropriate port mapping.
-8. Test the website using the EC2 public address.
+**Mansi Pandey**
 
-AWS resources will only be created after reviewing potential costs and confirming the plan.
-
-## Security Considerations
-
-- Never commit passwords, personal access tokens, or private SSH keys.
-- Use secure GitHub authentication.
-- Restrict SSH access to trusted IP addresses.
-- Review AWS costs before launching resources.
-- Stop or terminate unused AWS resources and check for remaining chargeable resources.
-
-## Learning Outcomes
-
-Through this project, we aim to learn:
-
-- Basic Git version control and GitHub collaboration.
-- Docker image creation and container execution.
-- Nginx-based website hosting.
-- Port mapping and local website testing.
-- Cloud deployment using AWS EC2.
-- Basic cloud security, cost awareness, and cleanup.
-
+GitHub: [MansiPandey-git](https://github.com/MansiPandey-git)
