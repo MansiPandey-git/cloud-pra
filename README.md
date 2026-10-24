@@ -155,6 +155,12 @@ Start the container again:
 sudo docker start cloud-pra-web
 ```
 
+## Website Deployment Screenshot
+
+The website successfully deployed on AWS EC2 using Docker and Nginx.
+
+![Cloud & DevOps Learning Hub deployed on AWS EC2](ec2-website.PNG)
+
 ## Key Learnings
 
 - Created and managed a Git repository using Git and GitHub.
